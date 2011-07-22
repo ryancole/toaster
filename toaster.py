@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import os, jinja2, yaml, re, markdown, datetime
+import os, jinja2, yaml, re, markdown, datetime, shutil
 
 
 def render_post(template_environment, file_name, file_content, path_site):
@@ -45,7 +45,17 @@ if __name__ == '__main__':
     template_environment = jinja2.Environment(loader=template_loader)
     
     for directory, directories, filenames in os.walk(path_working):
+        
+        # skip the data directories
+        if directory.startswith((path_site, path_layouts)):
+            continue
+        
+        # handle each file, otherwise
         for filename in filenames:
+            
+            # skip the config file
+            if filename in ['_config.yml']:
+                continue
             
             # check for a known file format
             basename, extension = os.path.splitext(filename)
@@ -58,3 +68,13 @@ if __name__ == '__main__':
                 # if the file has front matter then render it
                 if file_content:
                     render_post(template_environment, filename, file_content, path_site)
+            
+            else:
+                
+                file_path = '%s%s' % (path_site, os.path.join(directory, filename)[len(path_working):])
+                
+                if not os.path.exists(os.path.dirname(file_path)):
+                    os.makedirs(os.path.dirname(file_path))
+
+                # simply copy this file into the site directory
+                shutil.copy(os.path.join(directory, filename), file_path)
