@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 import os, jinja2, yaml, re, markdown, datetime, shutil
 
 
@@ -30,7 +28,7 @@ def render_post(template_environment, file_name, file_content, path_site):
         stream.writelines(template.render(template_context))
 
 
-if __name__ == '__main__':
+def begin():
     
     # get the working directory
     path_working = os.getcwd()
