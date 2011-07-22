@@ -1,44 +1,60 @@
 #!/usr/bin/env python
 
-import os, jinja2, yaml, re
+import os, jinja2, yaml, re, markdown, datetime
 
-def render_post(template_environment, path_post, path_site):
 
-    # read in the entire post
-    with open(path_post, 'r') as stream:
-        post_content = stream.read()
+def render_post(template_environment, file_name, file_content, path_site):
 
-    # extract the yaml front matter
-    front_matter = re.match('---\n(.*?)\n---', post_content, re.S)
+    # parse the yaml front matter
+    front_matter = yaml.load(file_content.group(1))
     
-    # only render files with front matter
-    if not front_matter:
-        return
+    # format the template context variable
+    template_context = dict(content=markdown.markdown(file_content.group(2)),
+                            title=front_matter['title'])
     
-    front_matter = yaml.load(front_matter.group(1))
+    # get the desired template file from the environment
+    template = template_environment.get_template('%s.html' % front_matter['layout'])
     
-    # save the rendered template to disk
-    template = template_environment.get_template('%s.html' % front_matter['template'])
+    # read out the file's date
+    file_name = file_name.split('-')
+    file_date = datetime.date(int(file_name[0]), int(file_name[1]), int(file_name[2]))
+    file_name = '-'.join(file_name[3:])
     
-    with open('%s/%s.html' % (path_site, os.path.splitext(os.path.basename(path_post))[0]), 'w') as stream:
-        stream.writelines(template.render())
+    # create the base path if it does not exist
+    file_path = '/%s/%s/%s/%s.html' % (file_date.year, file_date.month, file_date.day, os.path.splitext(file_name)[0])
+    if not os.path.exists('%s%s' % (path_site, os.path.dirname(file_path))):
+        os.makedirs('%s%s' % (path_site, os.path.dirname(file_path)))
+    
+    # write the rendered post to disk
+    with open('%s%s' % (path_site, file_path), 'w') as stream:
+        stream.writelines(template.render(template_context))
 
 
 if __name__ == '__main__':
     
     # get the working directory
     path_working = os.getcwd()
-    
-    # load the config file
-    with file(os.path.join(path_working, '_config.yml')) as stream:
-        config = yaml.load(stream)
-    
-    # initialize the template environment
-    template_loader = jinja2.FileSystemLoader(os.path.join(path_working, '_templates'))
-    template_environment = jinja2.Environment(loader=template_loader)
-    
-    # render each post
+
+    # relative paths
     path_site = os.path.join(path_working, '_site')
     path_posts = os.path.join(path_working, '_posts')
-    for path_post in [os.path.join(path_posts, f) for f in os.listdir(path_posts)]:
-        render_post(template_environment, path_post, path_site)
+    path_layouts = os.path.join(path_working, '_layouts')
+    
+    # initialize the template environment
+    template_loader = jinja2.FileSystemLoader(path_layouts)
+    template_environment = jinja2.Environment(loader=template_loader)
+    
+    for directory, directories, filenames in os.walk(path_working):
+        for filename in filenames:
+            
+            # check for a known file format
+            basename, extension = os.path.splitext(filename)
+            if extension in ['.markdown']:
+            
+                # extract the yaml front matter and post content
+                with open(os.path.join(directory, filename)) as stream:
+                    file_content = re.match('---\n(.*?)\n---\n(.*)', stream.read(), re.S)
+                
+                # if the file has front matter then render it
+                if file_content:
+                    render_post(template_environment, filename, file_content, path_site)
