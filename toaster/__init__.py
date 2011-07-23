@@ -1,4 +1,59 @@
-import os, jinja2, yaml, re, markdown, datetime, shutil
+
+import os, yaml, datetime, shutil
+import toaster.post
+
+class Toaster:
+
+
+    def __init__(self):
+        self.config = './_config.yml'
+        self.settings = dict(source='.', destination='./_site', layouts='./_layouts', posts='./_posts')
+
+
+    def load_config(self, path):
+        with open(path) as stream:
+            self.config = path
+            self.settings.update(yaml.load(stream))
+        return self.settings
+
+
+    def toast_directory(self, path):
+        
+        # walk the provided source path
+        for directory, directories, filenames in os.walk(path):
+            
+            # skip over any no-op dirs
+            if directory.startswith((self.settings['destination'], self.settings['layouts'])):
+                continue
+            
+            # toast each file
+            for filename in filenames:
+                self.toast_file(os.path.join(directory, filename))
+
+
+    def toast_file(self, path):
+        
+        # skip over any no-op files
+        if os.path.basename(path) in [os.path.basename(self.config)]:
+            return
+        
+        # operate on known markup langauges
+        basename, extension = os.path.splitext(os.path.basename(path))
+        if extension in ['.markdown', '.md']:
+            
+            # instantiate the post object
+            post = toaster.post.Post(self.settings, path)
+            
+            # toast the post
+            post.toast()
+        
+        else:
+            
+            # unknown markup language; simply copy
+            if not os.path.exists(os.path.dirname(os.path.join(self.settings['destination'], os.path.relpath(path)))):
+                os.makedirs(os.path.dirname(os.path.join(self.settings['destination'], os.path.relpath(path))))
+            
+            shutil.copy(path, os.path.join(self.settings['destination'], os.path.relpath(path)))
 
 
 def render_post(template_environment, file_name, file_content, path_site):
@@ -26,53 +81,3 @@ def render_post(template_environment, file_name, file_content, path_site):
     # write the rendered post to disk
     with open('%s%s' % (path_site, file_path), 'w') as stream:
         stream.writelines(template.render(template_context))
-
-
-def begin():
-    
-    # get the working directory
-    path_working = os.getcwd()
-
-    # relative paths
-    path_site = os.path.join(path_working, '_site')
-    path_posts = os.path.join(path_working, '_posts')
-    path_layouts = os.path.join(path_working, '_layouts')
-    
-    # initialize the template environment
-    template_loader = jinja2.FileSystemLoader(path_layouts)
-    template_environment = jinja2.Environment(loader=template_loader)
-    
-    for directory, directories, filenames in os.walk(path_working):
-        
-        # skip the data directories
-        if directory.startswith((path_site, path_layouts)):
-            continue
-        
-        # handle each file, otherwise
-        for filename in filenames:
-            
-            # skip the config file
-            if filename in ['_config.yml']:
-                continue
-            
-            # check for a known file format
-            basename, extension = os.path.splitext(filename)
-            if extension in ['.markdown']:
-            
-                # extract the yaml front matter and post content
-                with open(os.path.join(directory, filename)) as stream:
-                    file_content = re.match('---\n(.*?)\n---\n(.*)', stream.read(), re.S)
-                
-                # if the file has front matter then render it
-                if file_content:
-                    render_post(template_environment, filename, file_content, path_site)
-            
-            else:
-                
-                file_path = '%s%s' % (path_site, os.path.join(directory, filename)[len(path_working):])
-                
-                if not os.path.exists(os.path.dirname(file_path)):
-                    os.makedirs(os.path.dirname(file_path))
-
-                # simply copy this file into the site directory
-                shutil.copy(os.path.join(directory, filename), file_path)

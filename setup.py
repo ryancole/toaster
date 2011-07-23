@@ -8,6 +8,6 @@ setup(
     packages=['toaster'],
     scripts=['bin/toaster.py'],
     url='http://pypi.python.org/pypi/toaster/',
-    description='A static blog generator.',
+    description='A static blog generator inspired by Jekyll.',
     long_description=open('readme.md').read(),
 )
