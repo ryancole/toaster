@@ -1,14 +1,22 @@
-from distutils.core import setup
+import os
+from setuptools import setup, find_packages
 
-setup(
-    name='toaster',
-    version='0.0.1',
-    author='Ryan Cole',
-    author_email='ryan@rycole.com',
-    packages=['toaster'],
-    scripts=['bin/toast.py'],
-    url='http://pypi.python.org/pypi/toaster/',
-    description='A static blog generator inspired by Jekyll.',
-    long_description=open('README.txt').read(),
-    requires=['pyyaml', 'jinja2', 'markdown']
-)
+README = os.path.join(os.path.dirname(__file__),'README.rst')
+long_description = open(README).read() + '\n'
+
+setup(name='toaster',
+      version='0.0.1',
+      description='A static blog generator inspired by Jekyll.',
+      long_description=long_description,
+      classifiers=[
+        'License :: OSI Approved :: MIT License',
+        'Programming Language :: Python :: 2.6',
+      ],
+      keywords='toaster pip easy_install distutils setuptools',
+      author='Ryan Cole',
+      author_email='ryan@rycole.com',
+      url='https://github.com/ryancole/toaster',
+      license='MIT',
+      packages=find_packages(),
+      include_package_data=True,
+      zip_safe=False)
