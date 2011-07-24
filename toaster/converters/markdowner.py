@@ -1,5 +1,5 @@
 
-import markdown as _markdown
+import markdown
 
 class MarkdownConverter:
     
@@ -7,4 +7,4 @@ class MarkdownConverter:
         self.extensions = ['.md', '.markdown']
     
     def convert(self, content):
-        return _markdown.markdown(content)
+        return markdown.markdown(content)
