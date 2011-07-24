@@ -1,5 +1,6 @@
 
-import yaml, re, jinja2, markdown
+import yaml, re, jinja2, markdown, datetime, os
+
 
 class Post:
 
@@ -29,4 +30,23 @@ class Post:
         template_loader = jinja2.FileSystemLoader(self.settings['layouts'])
         template_environment = jinja2.Environment(loader=template_loader)
         
+        # template context
+        template_context = dict(content=markdown.markdown(self.content),
+                                meta=self.front_matter)
         
+        # get the desired template file from the environment
+        template = template_environment.get_template('%s.html' % self.front_matter['layout'])
+        
+        # get the post's date from the name
+        filename = os.path.splitext(os.path.basename(self.path))[0].split('-')
+        date = datetime.date(int(filename[0]), int(filename[1]), int(filename[2]))
+        filename = '%s.html' % '-'.join(filename[3:]).lower()
+        
+        # create the base path if it does not exist
+        filepath = os.path.join(self.settings['destination'], str(date.year), str(date.month), str(date.day))
+        if not os.path.exists(filepath):
+            os.makedirs(filepath)
+        
+        # write the rendered post to disk
+        with open(os.path.join(filepath, filename), 'w') as stream:
+            stream.writelines(template.render(template_context))

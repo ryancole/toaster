@@ -2,8 +2,8 @@
 import os, yaml, datetime, shutil
 import toaster.post
 
-class Toaster:
 
+class Toaster:
 
     def __init__(self):
         self.config = './_config.yml'
@@ -54,30 +54,3 @@ class Toaster:
                 os.makedirs(os.path.dirname(os.path.join(self.settings['destination'], os.path.relpath(path))))
             
             shutil.copy(path, os.path.join(self.settings['destination'], os.path.relpath(path)))
-
-
-def render_post(template_environment, file_name, file_content, path_site):
-
-    # parse the yaml front matter
-    front_matter = yaml.load(file_content.group(1))
-    
-    # format the template context variable
-    template_context = dict(content=markdown.markdown(file_content.group(2)),
-                            title=front_matter['title'])
-    
-    # get the desired template file from the environment
-    template = template_environment.get_template('%s.html' % front_matter['layout'])
-    
-    # read out the file's date
-    file_name = file_name.split('-')
-    file_date = datetime.date(int(file_name[0]), int(file_name[1]), int(file_name[2]))
-    file_name = '-'.join(file_name[3:])
-    
-    # create the base path if it does not exist
-    file_path = '/%s/%s/%s/%s.html' % (file_date.year, file_date.month, file_date.day, os.path.splitext(file_name)[0])
-    if not os.path.exists('%s%s' % (path_site, os.path.dirname(file_path))):
-        os.makedirs('%s%s' % (path_site, os.path.dirname(file_path)))
-    
-    # write the rendered post to disk
-    with open('%s%s' % (path_site, file_path), 'w') as stream:
-        stream.writelines(template.render(template_context))
