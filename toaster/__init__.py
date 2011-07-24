@@ -39,7 +39,7 @@ class Toaster:
         
         # operate on known markup langauges
         basename, extension = os.path.splitext(os.path.basename(path))
-        if extension in ['.markdown', '.md']:
+        if extension in ['.markdown', '.md', '.html']:
             
             # instantiate the post object
             post = toaster.post.Post(self.settings, path)
