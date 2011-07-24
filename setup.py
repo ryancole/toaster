@@ -9,6 +9,6 @@ setup(
     scripts=['bin/toast.py'],
     url='http://pypi.python.org/pypi/toaster/',
     description='A static blog generator inspired by Jekyll.',
-    long_description=open('readme.md').read(),
+    long_description=open('README.txt').read(),
     requires=['pyyaml', 'jinja2', 'markdown']
 )
