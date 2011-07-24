@@ -1,12 +1,14 @@
 
 import os, yaml, datetime, shutil
 import toaster.post
+import toaster.converters
 
 
 class Toaster:
 
     def __init__(self):
         self.config = './_config.yml'
+        self.converters = toaster.converters.ConverterManager()
         self.settings = dict(source='.', destination='./_site', layouts='./_layouts', posts='./_posts')
 
 
@@ -37,15 +39,15 @@ class Toaster:
         if os.path.basename(path) in [os.path.basename(self.config)]:
             return
         
-        # operate on known markup langauges
+        # operate on known converters
         basename, extension = os.path.splitext(os.path.basename(path))
-        if extension in ['.markdown', '.md', '.html']:
+        if extension in self.converters.extensions:
             
             # instantiate the post object
             post = toaster.post.Post(self.settings, path)
             
             # toast the post
-            post.toast()
+            post.toast(self.converters.converter_for_extension(extension))
         
         else:
             

@@ -24,14 +24,14 @@ class Post:
         return None, None
     
     
-    def toast(self):
+    def toast(self, converter):
         
         # instanciate the template environment
         template_loader = jinja2.FileSystemLoader(self.settings['layouts'])
         template_environment = jinja2.Environment(loader=template_loader)
         
         # template context
-        template_context = dict(content=markdown.markdown(self.content),
+        template_context = dict(content=converter.convert(self.content),
                                 meta=self.front_matter)
         
         # get the desired template file from the environment
