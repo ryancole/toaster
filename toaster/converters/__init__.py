@@ -1,10 +1,10 @@
 
-from toaster.converters import markdowner
+from toaster.converters import markdowner, rawer
 
 class ConverterManager:
     
     def __init__(self):
-        self.converters = dict(markdown=markdowner.MarkdownConverter())
+        self.converters = dict(markdown=markdowner.MarkdownConverter(), raw=rawer.RawConverter())
         self.extensions = [converter.extensions for converter in self.converters.values()]
         self.extensions = sum(self.extensions, [])
     
