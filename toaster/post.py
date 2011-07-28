@@ -1,6 +1,8 @@
 
 import os, re, datetime, markdown
 from toaster.convertible import Convertible
+from toaster.converters import ConverterProvider
+from toaster.converters import *
 
 
 class Post(Convertible):
@@ -30,4 +32,11 @@ class Post(Convertible):
             self.meta, content = self.read_yaml(self.path)
             
             # store the post content as markdown
-            self.content = markdown.markdown(content)
+            for converter in ConverterProvider.plugins:
+                converter = converter()
+                if self.extension in converter.extensions:
+                    self.content = converter.convert(content)
+                    break
+                
+                # no converter found for this extensions; fall back to raw
+                self.content = content

@@ -1,14 +1,10 @@
+import os, glob
+from toaster.plugin import Plugin
 
-from toaster.converters import markdowner, rawer
 
-class ConverterManager:
-    
-    def __init__(self):
-        self.converters = dict(markdown=markdowner.MarkdownConverter(), raw=rawer.RawConverter())
-        self.extensions = [converter.extensions for converter in self.converters.values()]
-        self.extensions = sum(self.extensions, [])
-    
-    def converter_for_extension(self, extension):
-        for converter in self.converters.keys():
-            if extension in self.converters[converter].extensions:
-                return self.converters[converter]
+class ConverterProvider(object):
+    __metaclass__ = Plugin
+
+
+# specify that we want to import all of the modules in this package
+__all__ = [ os.path.basename(f)[:-3] for f in glob.glob(os.path.dirname(__file__) + '/*.py')]
