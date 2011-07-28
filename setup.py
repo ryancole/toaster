@@ -19,5 +19,5 @@ setuptools.setup(
     license = 'MIT',
     keywords = 'toaster static blog jekyll',
     url = 'https://github.com/ryancole/toaster',
-    include_package_data = True,
+    include_package_data = True
 )
