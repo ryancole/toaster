@@ -1,6 +1,8 @@
+import os, yaml, jinja2, shutil
 
-import os, yaml, jinja2
 from toaster.post import Post
+from toaster.page import Page
+
 
 class Site:
     
@@ -29,12 +31,39 @@ class Site:
         posts_path = os.path.join(self.settings['source'], '_posts')
         self.posts = [Post(self, os.path.join(posts_path, filename)) for filename in os.listdir(posts_path)]
         
+        self.pages = list()
+        
         # read in the pages and static content
         for directory, directories, filenames in os.walk(self.settings['source']):
+            
+            # filter out directories that contain toaster content
+            for dir in directories:
+                if os.path.relpath(dir).startswith('_'):
+                    directories.remove(dir)
+            
+            # if the current directory contains toast content then skip it, too
+            if os.path.relpath(directory).startswith('_'):
+                continue
+            
             if filenames:
-                print filenames
+                for filename in filenames:
+                    with open(os.path.join(directory, filename)) as stream:
+                        if stream.read(3) == '---':
+                            
+                            # file appears to have yaml front matter; page
+                            self.pages.append(Page(self, os.path.join(directory, filename)))
+                            
+                        else:
+                            base_path = os.path.relpath(os.path.join(self.settings['destination'], os.path.relpath(directory)))
+                            if not os.path.exists(base_path):
+                                os.makedirs(base_path)
+                            
+                            shutil.copy(os.path.join(directory, filename), base_path)
     
     
     def render(self):
         for post in self.posts:
             post.render()
+        
+        for page in self.pages:
+            page.render()
