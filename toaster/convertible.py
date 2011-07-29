@@ -10,7 +10,7 @@ class Convertible:
         with open(path) as stream:
             content = stream.read()
             
-        groups = re.match('---\n(.*?)\n---\n(.*)', content, re.S)
+        groups = re.match('---\s+(.*?)\s+---\s+(.*)', content, re.S)
         if groups:
             return (yaml.load(groups.group(1)), groups.group(2))
         
