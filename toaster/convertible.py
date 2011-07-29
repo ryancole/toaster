@@ -19,8 +19,8 @@ class Convertible:
     
     def render(self):
         
-        # template context hash
-        template_context = { 'content': self.content, 'meta': self.meta }
+        # populate template context hash
+        template_context = { 'site': self.site, 'meta': self.meta, 'content': self.content }
         
         # get the desired template file from the environment
         template = self.site.template_environment.get_template('%s.html' % self.meta['layout'])

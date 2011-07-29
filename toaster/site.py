@@ -1,4 +1,4 @@
-import os, yaml, jinja2, shutil
+import os, yaml, jinja2, shutil, datetime
 
 from toaster.post import Post
 from toaster.page import Page
@@ -7,6 +7,9 @@ from toaster.page import Page
 class Site:
     
     def __init__(self):
+        
+        # some site variables
+        self.timestamp = datetime.datetime.now()
         
         # initialize the default settings
         self.settings = { 'source': os.getcwd(), 'destination': os.path.join(os.getcwd(), '_site') }
