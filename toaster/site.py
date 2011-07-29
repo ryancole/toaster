@@ -38,7 +38,7 @@ class Site:
             
             # filter out directories that contain toaster content
             for dir in directories:
-                if os.path.relpath(dir).startswith('_'):
+                if os.path.relpath(dir).startswith(('_', '.')):
                     directories.remove(dir)
             
             # if the current directory contains toast content then skip it, too
@@ -47,18 +47,24 @@ class Site:
             
             if filenames:
                 for filename in filenames:
+                    
+                    # filter out files that contain toaster content
+                    if filename.startswith(('.', '_')):
+                        continue
+                    
                     with open(os.path.join(directory, filename)) as stream:
-                        if stream.read(3) == '---':
-                            
-                            # file appears to have yaml front matter; page
-                            self.pages.append(Page(self, os.path.join(directory, filename)))
-                            
-                        else:
-                            base_path = os.path.relpath(os.path.join(self.settings['destination'], os.path.relpath(directory)))
-                            if not os.path.exists(base_path):
-                                os.makedirs(base_path)
-                            
-                            shutil.copy(os.path.join(directory, filename), base_path)
+                        first_three = stream.read(3)
+                    
+                    # treat the file as a page if it has yaml front matter
+                    if first_three == '---':
+                        self.pages.append(Page(self, os.path.join(directory, filename)))
+                        
+                    else:
+                        base_path = os.path.relpath(os.path.join(self.settings['destination'], os.path.relpath(directory)))
+                        if not os.path.exists(base_path):
+                            os.makedirs(base_path)
+                        
+                        shutil.copy(os.path.join(directory, filename), base_path)
     
     
     def render(self):
