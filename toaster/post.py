@@ -1,5 +1,7 @@
+# -*- coding: utf-8 -*-
 
 import os, re, datetime, markdown
+
 from toaster.convertible import Convertible
 from toaster.converters import ConverterProvider
 from toaster.converters import *

@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 class Plugin(type):
     
     def __init__(cls, name, bases, attrs):

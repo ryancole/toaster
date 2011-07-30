@@ -1,5 +1,7 @@
+# -*- coding: utf-8 -*-
 
 import os, re, yaml
+
 from toaster.convertible import Convertible
 
 

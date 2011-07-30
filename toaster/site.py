@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import os, yaml, jinja2, shutil, datetime
 
 from toaster.post import Post
