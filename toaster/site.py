@@ -6,12 +6,70 @@ from toaster.post import Post
 from toaster.page import Page
 
 
+class HtmlLoader(jinja2.BaseLoader):
+
+    def __init__(self, paths):
+        self.paths = paths
+    
+    
+    def get_source(self, environment, template):
+        
+        for path in self.paths:
+            for directory, directories, filenames in os.walk(path):
+                
+                # filter out directories that contain toaster content
+                for dir in directories:
+                    if os.path.relpath(dir).startswith(('_', '.')):
+                        directories.remove(dir)
+            
+                # if the current directory contains toast content then skip it, too
+                if os.path.relpath(directory).startswith('_') and os.path.relpath(directory) != '_layouts':
+                    continue
+                
+                if os.path.isfile(os.path.join(directory, template)):
+                    
+                    mtime = os.path.getmtime(os.path.join(directory, template))
+                    
+                    def uptodate():
+                        return os.path.getmtime(os.path.join(directory, template)) == mtime
+                    
+                    with file(os.path.join(directory, template)) as stream:
+                        content = stream.read().decode('utf-8')
+                    
+                    return content, os.path.join(directory, template), uptodate
+                
+            raise jinja2.TemplateNotFound(template)
+
+
+    def list_templates(self):
+        
+        # init templates set; ugly
+        templates = set()
+        
+        # list html filess
+        for path in self.paths:
+            for directory, directories, filenames in os.walk(path):
+ 
+                # filter out directories that contain toaster content
+                for dir in directories:
+                    if os.path.relpath(dir).startswith(('_', '.')):
+                        directories.remove(dir)
+            
+                # if the current directory contains toast content then skip it, too
+                if os.path.relpath(directory).startswith('_') and os.path.relpath(directory) != '_layouts':
+                    continue
+                
+                # add files ending with an html ext
+                for filename in filenames:
+                    if filename.endswith('.html'):
+                        templates.add(os.path.relpath(os.path.join(directory, filename)))
+
+        return sorted(templates)
+
+
 class Site:
     
     def __init__(self):
-        
-        # some site variables
-        self.timestamp = datetime.datetime.now()
         
         # initialize the default settings
         self.settings = { 'source': os.getcwd(), 'destination': os.path.join(os.getcwd(), '_site') }
@@ -20,13 +78,11 @@ class Site:
         self.load_settings(os.path.join(self.settings['source'], '_config.yml'))
         
         # initialize the jinja template environment
-        template_loader = jinja2.FileSystemLoader(os.path.join(self.settings['source'], '_layouts'))
-        self.template_environment = jinja2.Environment(loader=template_loader)
+        self.template_environment = jinja2.Environment(loader=HtmlLoader([self.settings['source']]))
         
     
     def load_settings(self, path):
         with open(path) as stream:
-            self.config = path
             self.settings.update(yaml.load(stream))
         
     
@@ -57,11 +113,8 @@ class Site:
                     if filename.startswith(('.', '_')):
                         continue
                     
-                    with open(os.path.join(directory, filename)) as stream:
-                        first_three = stream.read(3)
-                    
-                    # treat the file as a page if it has yaml front matter
-                    if first_three == '---':
+                    # treat the file as a page if it's html
+                    if filename.endswith('.html'):
                         self.pages.append(Page(self, os.path.join(directory, filename)))
                         
                     else:
