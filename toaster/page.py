@@ -8,9 +8,13 @@ from toaster.convertible import Convertible
 class Page(Convertible):
     
     def __init__(self, site, path):
+        
+        # store page path data
         self.site = site
         self.path = path
         self.filename = os.path.basename(path)
+        
+        # process data from page file
         self.process(self.filename)
         
     
@@ -26,7 +30,7 @@ class Page(Convertible):
     def render(self):
         
         # populate template context hash
-        template_context = { 'site': self.site, 'meta': self.meta, 'content': self.content }
+        template_context = { 'site': self.site, 'content': self.content }
         
         # get the desired template file from the environment
         template = self.site.template_environment.get_template(os.path.relpath(self.path))
