@@ -10,11 +10,19 @@ from toaster.converters import *
 class Post(Convertible):
     
     def __init__(self, site, path):
+        
+        # store post path data
         self.site = site
         self.path = path
         self.filename = os.path.basename(path)
+        
+        # process data from post file
         self.process(self.filename)
         
+
+    def __repr__(self):
+        return '<Post: %s>' % self.meta['title']
+
 
     def process(self, filename):
         

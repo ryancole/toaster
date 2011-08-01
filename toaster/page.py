@@ -13,6 +13,10 @@ class Page(Convertible):
         self.filename = os.path.basename(path)
         self.process(self.filename)
         
+    
+    def __repr__(self):
+        return '<Page: %s>' % self.url
+
 
     def process(self, filename):
         self.url = os.path.join(self.site.settings['destination'], self.path)

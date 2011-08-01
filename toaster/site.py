@@ -78,8 +78,8 @@ class Site:
         self.load_settings(os.path.join(self.settings['source'], '_config.yml'))
         
         # initialize the jinja template environment
-        self.template_environment = jinja2.Environment(loader=HtmlLoader([self.settings['source']]))
-        
+        self.template_environment = jinja2.Environment(loader=HtmlLoader([self.settings['source']]), autoescape=True)
+    
     
     def load_settings(self, path):
         with open(path) as stream:
