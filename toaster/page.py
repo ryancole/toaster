@@ -25,12 +25,11 @@ class Page(Convertible):
     def process(self, filename):
         self.url = os.path.join(self.site.settings['destination'], self.path)
         self.meta, self.content = self.read_yaml(self.path)
+        
+        self.context = { 'content': self.content, 'site': self.site }
 
 
     def render(self):
-        
-        # populate template context hash
-        template_context = { 'site': self.site, 'content': self.content }
         
         # get the desired template file from the environment
         template = self.site.template_environment.get_template(os.path.relpath(self.path))
@@ -41,4 +40,4 @@ class Page(Convertible):
         
         # write the rendered post to disk
         with open(self.url, 'w') as stream:
-            stream.writelines(template.render(template_context))
+            stream.writelines(template.render(self.context))

@@ -20,16 +20,14 @@ class Convertible:
     
     def render(self):
         
-        # populate template context hash
-        template_context = { 'site': self.site, 'meta': self.meta, 'content': self.content }
-        
         # get the desired template file from the environment
         template = self.site.template_environment.get_template('%s.html' % self.meta['layout'])
         
         # create the base path if it does not exist
-        if not os.path.exists(os.path.dirname(self.url)):
-            os.makedirs(os.path.dirname(self.url))
+        base_path = os.path.relpath(os.path.join(self.site.settings['destination'], os.path.dirname(self.url)))
+        if not os.path.exists(base_path):
+            os.makedirs(base_path)
         
         # write the rendered post to disk
-        with open(self.url, 'w') as stream:
-            stream.writelines(template.render(template_context))
+        with open(os.path.relpath(os.path.join(self.site.settings['destination'], self.url)), 'w') as stream:
+            stream.writelines(template.render(self.context))
