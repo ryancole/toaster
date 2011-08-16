@@ -24,6 +24,12 @@ class Post(Convertible):
         return self.meta['title']
 
 
+    def __getitem__(self, var):
+        if var in vars(self).keys():
+            return vars(self)[var]
+        raise KeyError
+
+
     def process(self, filename):
         
         # check the filename for appropriate syntax

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import os, yaml, jinja2, shutil, datetime
+import os, yaml, jinja2, shutil, datetime, operator
 
 from toaster.post import Post
 from toaster.page import Page
@@ -91,6 +91,7 @@ class Site:
         # read in the posts
         posts_path = os.path.join(self.settings['source'], '_posts')
         self.posts = [Post(self, os.path.join(posts_path, filename)) for filename in os.listdir(posts_path)]
+        self.posts.sort(key=lambda item: item['date'], reverse=True)
         
         self.pages = list()
         
