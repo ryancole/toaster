@@ -2,7 +2,7 @@
 Toaster
 =======
 
-Toaster is a simple static blog generator. The goal, with Toaster, is to mimic the functionality and usage of Jekyll. So why Toaster, then? It's written in Python and feels more lightweight than Hyde, which is also in Python.
+Toaster is a simple static blog generator. The goal, with Toaster, is to mimic the functionality and usage of Jekyll. So why Toaster, then? It's written in Python and feels more lightweight than Hyde, which seems to be the current Python alternative to Jekyll.
 
 Getting Started
 ===============
