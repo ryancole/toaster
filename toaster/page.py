@@ -25,7 +25,6 @@ class Page(Convertible):
     def process(self, filename):
         self.url = os.path.join(self.site.settings['destination'], self.path)
         self.meta, self.content = self.read_yaml(self.path)
-        
         self.context = { 'content': self.content, 'site': self.site }
 
 

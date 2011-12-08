@@ -57,6 +57,9 @@ class Post(Convertible):
                     # no converter found for this extensions; fall back to raw
                     self.content = content
             
+            # splice out a preview string of this post
+            self.preview = '.'.join(self.content.split('.')[:3])
+            
             # format the template context
             self.context = { 'title': self.meta['title'], 'date': self.date,
-                             'url': self.url, 'content': self.content }
+                             'url': self.url, 'content': self.content, 'preview': self.preview }
