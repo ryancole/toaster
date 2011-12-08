@@ -58,7 +58,13 @@ class Post(Convertible):
                     self.content = content
             
             # splice out a preview string of this post
-            self.preview = '.'.join(self.content.split('.')[:3])
+            split_content = self.content.split('.')[:3]
+            self.preview = '.'.join(split_content)
+            
+            # hack to append final period
+            if len(split_content) == 3:
+                split_content.append('')
+                self.preview = '.'.join(split_content)
             
             # format the template context
             self.context = { 'title': self.meta['title'], 'date': self.date,
