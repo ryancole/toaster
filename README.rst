@@ -14,7 +14,11 @@ If you have feedback, ideas, or suggestions, please create an Issue. If you are 
 Getting Started
 ===============
 
-Toaster can be installed from pypi using pip. Invoke Toaster using the "toast" command.
+Toaster can be installed from pypi using pip.
+
+    | pip install toaster
+
+Invoke Toaster using the "toast" command inside of your blog's working directory.
 
 Runtime Dependencies
 ====================
