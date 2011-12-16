@@ -4,7 +4,7 @@ README = os.path.join(os.path.dirname(__file__),'README.rst')
 
 setuptools.setup(
     name = 'toaster',
-    version = '0.0.3',
+    version = '0.0.4',
     packages = setuptools.find_packages(),
     scripts = ['bin/toast'],
     install_requires = ['pyyaml', 'markdown', 'jinja2'],
